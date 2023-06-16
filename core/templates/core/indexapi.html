@@ -1,0 +1,126 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+
+{% if user.is_superuser %}
+
+{% else %}
+    <section class="section-margin mt-0">
+      <div class="owl-carousel owl-theme hero-carousel">
+        <div class="hero-carousel__slide">
+          <img src="{% static 'core/img/home/bandanasola.jpg' %}" alt="" class="img-fluid">
+          <a href="#" class="hero-carousel__slideOverlay">
+            <h3>Bandana </h3>
+            <p>Accesorios</p>
+          </a>
+        </div>
+        <div class="hero-carousel__slide">
+          <img src="{% static 'core/img/home/identificadorsolo.jpg' %}" alt="" class="img-fluid">
+          <a href="#" class="hero-carousel__slideOverlay">
+            <h3>Identificador</h3>
+            <p>Accesorios</p>
+          </a>
+        </div>
+        <div class="hero-carousel__slide">
+          <img src="{% static 'core/img/home/correasola.webp '%}" alt="" class="img-fluid">
+          <a href="#" class="hero-carousel__slideOverlay">
+            <h3>Correa</h3>
+            <p>Accesorios</p>
+          </a>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+    <!--================ Hero Carousel end =================-->
+
+    <!-- ================ trending product section start ================= --> 
+
+    <section class="section-margin calc-60px">
+      <div class="container">
+        <!--PONER EN EL FOOTER-->
+        <h6>UF: {{monedas.uf.valor}} - DOLAR: {{monedas.dolar.valor}}<h6>
+          <!--PONER EN EL FOOTER-->
+        {% if user.is_superuser %}
+        <div class="section-intro pb-60px">
+          <h2><span class="section-intro__style">Administracion de Productos</span></h2>
+        </div>
+        {% else %}
+        <div class="section-intro pb-60px">
+        <p>Algunos productos disponibles del mercado</p>
+        <h2><span class="section-intro__style">Nuestros Productos</span></h2>
+        </div>
+        {% endif %}
+        <div class="row">
+          {% for aux in listaProductos %}
+          <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card text-center card-product">
+              <div class="card-product__img">
+                  {% if aux.imagen %}
+                  <img class="card-img" src="{{ aux.imagen }}">
+                  {% else %}
+                  <img class="card-img" src="ruta statica">
+                  {% endif %}
+                  <ul class="card-product__imgOverlay">
+                    {% if user.is_superuser %}
+                    <li><button onclick="deleteProducto({{ aux.id }})"><i class="ti-trash"></i></button></li>
+                    <li><button><a href="{% url 'update' aux.id %}"><i class="ti-reload"></i></button></li></a>
+                    <li><button><a href="{% url 'add' %}"><i class="ti-plus"></i></button></li></a>
+                    {% else %}
+                    <li><button><a href="{% url 'cartadd' aux.id %}"><i class="ti-shopping-cart"></i></button></li></a>
+                    {% endif %}
+                  </ul>
+              </div>
+              <div class="card-body">
+                <h4 class="card-product__title"><a href="{% static 'core/single-product.html' %}">{{ aux.nombre }}</a></h4>
+                {% if aux.stock >= 9 %}
+                <p>Stock: {{ aux.stock }}</p>
+                {% else %}
+                <p>AGOTADO</p>
+                {% endif %}
+                <p class="card-product__price">${{ aux.precio }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% if user.is_superuser %}
+        {% include 'core/paginator.html' %}
+        {% else %}
+        
+        {% endif %}
+      </div>
+      <!--{% for aux in personajes%}
+        <p>Nombre :{{aux.name}}<p>
+          <img src='{{ aux.image}}' alt=''>
+      {% endfor%}--> 
+    </section>
+
+
+
+    <!-- ================ offer section start ================= --> 
+    {% if user.is_superuser %}
+
+    {% else %}
+    <section class="offer" id="parallax-1" data-anchor-target="#parallax-1" data-300-top="background-position: 20px 30px" data-top-bottom="background-position: 0 20px">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5">
+            <div class="offer__content text-center">
+              <h3>Descuento de 5% para usuarios suscritos</h3>
+              <h4></h4>
+              <p>Obtener mas informacion</p>
+              <a class="button button--active mt-3 mt-xl-4" href="{% url 'subsForm' %}">Suscríbete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endif %}
+    <!-- ================ offer section end ================= --> 
+
+    <!-- ================ Best Selling item  carousel ================= --> 
+ {% endblock %}
+
+ {% block js %}
+
+ {% endblock %}
