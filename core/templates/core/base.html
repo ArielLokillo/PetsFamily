@@ -70,11 +70,11 @@
 						
 						{% if user.is_authenticated %}
 						<li class="nav-item"><a class="nav-link" href="{% url 'perfil' %}">perfil</a></li>
+						<li class="nav-item"><a class="nav-link" href="{% url 'tracking-order' %}">Envio</a></li>
 						<li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesion</a></li>
 						{% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesion</a></li>
 						<li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
-						<li class="nav-item"><a class="nav-link" href="{% url 'tracking-order' %}">Envio</a></li>
 						{% endif %}
 					  
 					
