@@ -72,12 +72,17 @@
               </div>
               <div class="card-body">
                 <h4 class="card-product__title"><a href="{% static 'core/single-product.html' %}">{{ aux.nombre }}</a></h4>
+                {% if aux.precio <= 0 %}
+                <p style = "color: red;" >ERROR PRECIO</p>
+                {% else %}
+                <p class="card-product__price">${{ aux.precio }}</p>
+                {% endif %}
                 {% if aux.stock >= 9 %}
                 <p>Stock: {{ aux.stock }}</p>
                 {% else %}
-                <p>AGOTADO</p>
+                <p style = "color: red;" >AGOTADO</p>
                 {% endif %}
-                <p class="card-product__price">${{ aux.precio }}</p>
+                
               </div>
             </div>
           </div>
