@@ -15,6 +15,7 @@ urlpatterns = [
     path('', index, name = "index"),
     path('indexapi/', indexapi, name = "indexapi"),
     path('blog/', blog, name = "blog"),
+    path('blogapi/', blogapi, name = "blogapi"),
     path('cart/', cart, name = "cart"),
     path('cartUser/', cartUser, name = "cartUser"),
     path('category/', category, name = "category"),
