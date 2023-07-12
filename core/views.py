@@ -5,11 +5,24 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from rest_framework import viewsets
 from .serializers import *
 import requests 
 # Create your views here.
+
+#funcion generica que valida grupos
+#USO : @grupo_requerido('cliente')
+def grupo_requerido(nombre_grupo):
+	def decorator(view_func):
+		@user_passes_test(lambda user: user.groups.filter(name=nombre_grupo).exists())
+		def wrapper(request, *args, **kwargs):
+			return view_func(request, *args, **kwargs)
+		return wrapper
+	return decorator
+
+
+
 
 class ProductoViewset(viewsets.ModelViewSet):
 	queryset = Producto.objects.all()
@@ -35,6 +48,18 @@ def indexapi(request):
 	}
 	return render(request, 'core/indexapi.html', data)
 
+	#API ANIMALES
+def blogapi(request):
+	#Solicitud al api
+	respuesta4 = requests.get('https://dog.ceo/api/breeds/image/random')
+	#TRANSFORMAMOS A JSON
+	animales = respuesta4.json()
+
+	data = {
+		'animales' : animales,
+	}
+	return render(request, 'core/blogapi.html', data)
+
 def index(request):
 	productosAll = Producto.objects.all()
 	page = request.GET.get('page', 1)
@@ -52,6 +77,7 @@ def index(request):
 
 def blog(request):
 	return render(request, 'core/blog.html')
+
 
 #def cart(request):
     
@@ -291,7 +317,15 @@ def add_compra(request):
     carro_compras.items.clear()
     return redirect(to='confirmation')
 
+def realizar_compra(request, producto_id):
+	producto = Producto.objects.get(all)
+	compra = Compra(usuario=requests.user, producto=producto)
+	compra.save()
+	return redirect('historial_compras')
 
+def historial_compras(request):
+	compras = Compra.objects.filter(usuario=request.user)
+	return render(request, 'core/historial_compras.html',{'compras' : compras})
 
 
 
