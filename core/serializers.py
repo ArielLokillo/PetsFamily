@@ -14,4 +14,16 @@ class ProductoSerializer(serializers.ModelSerializer):
         model = Producto
         fields = '__all__'
 
+class CarroItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CarroItem
+        fields = '__all__'
+
+class CarroComprasSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CarroCompras
+        fields = '__all__'
+
 # SERIALIZER - VIEWSET - URL

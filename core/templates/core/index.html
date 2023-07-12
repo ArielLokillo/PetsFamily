@@ -66,6 +66,7 @@
                   <li><button><a href="{% url 'update' aux.id %}"><i class="ti-reload"></i></button></li></a>
                   <li><button><a href="{% url 'add' %}"><i class="ti-plus"></i></button></li></a>
                   {% else %}
+                  <li><a href="{% url 'singleproduct' aux.id %}"><button><i class="ti-search"></i></button></a></li>
                   <li><button><a href="{% url 'cartadd' aux.id %}"><i class="ti-shopping-cart"></i></button></li></a>
                   {% endif %}
                 </ul>
@@ -100,7 +101,7 @@
 
     <!-- ================ offer section start ================= --> 
     {% if user.is_superuser %}
-
+    
     {% else %}
     <section class="offer" id="parallax-1" data-anchor-target="#parallax-1" data-300-top="background-position: 20px 30px" data-top-bottom="background-position: 0 20px">
       <div class="container">

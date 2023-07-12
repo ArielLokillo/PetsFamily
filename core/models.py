@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import AbstractUser,Group
 
 # Create your models here.
 class TipoProducto(models.Model):
@@ -32,6 +35,13 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def vender(self, cantidad):
+        if cantidad <= self.stock:
+            self.stock -= cantidad
+            self.save()
+        else:
+            raise ValueError("No hay suficiente stock disponible")
 
 class CarroItem(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
@@ -75,14 +85,3 @@ class CarroCompras(models.Model):
             total += item.subtotal()
         return total
 
-class cliente(Group):
-    pass
-
-class vendedor(Group):
-    pass
-
-@receiver(post_save, sender=User)
-def assign_user_to_group(sender, instance, created, **kwargs):
-    if created:
-        group = Group.objects.get(name='cliente')
-        instance.groups.add(group)
