@@ -3,6 +3,7 @@ from .models import *
 # Register your models here.
 
 
+
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ['nombre','precio','stock','descripcion','tipo','created_at','updated_at']
     search_fields = ['nombre']
@@ -48,5 +49,3 @@ admin.site.register(CarroItem, CarroItemAdmin)
 admin.site.register(Compra, CompraAdmin)
 admin.site.register(CompraItem, CompraItemAdmin)
 admin.site.register(CarroCompras, CarroComprasAdmin)
-
-
