@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block contenido %}
+{% load humanize %}
+
+
+{% block css %}
+
+{% endblock %}
+
+
+    <!--================ Start Header Menu Area =================-->
+
+    <!--================ End Header Menu Area =================-->
+
+    <!-- ================ start banner area ================= -->
+
+    <!-- ================ end banner area ================= -->
+
+
+
+    <!--================Cart Area =================-->
+    <section class="cart_area">
+        <div class="container">
+            <div class="cart_inner">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for compras in Compra %}
+                                <tr>
+                                    <td>
+                                        <div class="media">
+                                            <div class="d-flex">
+                                                <img src="{{x.producto.imagen.url}}" alt="" height="80px" width="60px">
+                                            </div>
+                                            <div class="media-body">
+                                                <p>{{ Compra.producto.id }}</p>
+                                            </div>
+                                            <div class="media-body">
+                                                <p>{{ Compra.producto.nombre }}</p>
+                                            </div>
+                                            <div class="media-body">
+                                                <p>{{ Compra.producto.precio }}</p>
+                                            </div>
+                                            <div class="media-body">
+                                                <p>{{ Compra.producto.cantidad }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h5>${{ Compra.producto.precio }}</h5>
+                                    </td>
+                                    <td>
+                                        <h5><a href="{% url 'cartdel'  x.producto.id %}" style="text-decoration: none;"><i class="ti-minus"></i></a>
+                                            {{ x.cantidad }}
+                                            <a href="{% url 'cartaddd'  x.producto.id %}" style="text-decoration: none;"><i class="ti-plus"></i></a>
+                                        </h5>
+                                    </td>
+                                    <td>
+                                        <h5>${{ x.subtotal }}</h5>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'cartdelete' x.producto.id %}" style="text-decoration: none;"><i class="ti-trash"></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            
+                            <tr class="bottom_button">
+                                <td>
+                                   
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    
+                                </td>
+                                <td>
+
+                            </tr>
+                            <tr class="shipping_area">
+                                <td class="d-none d-md-block">
+
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr class="out_button_area">
+                                <td class="d-none-l">
+
+                                </td>
+                                <td class="">
+
+                                </td>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <div class="checkout_btn_inner d-flex align-items-center">
+                                        <a class="gray_btn" href="{% url 'index' %}">Volver</a>
+                                        <div id = "btnPaypal"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--================End Cart Area =================-->
+
+
+
+    <!--================ Start footer Area  =================-->
+    {% endblock %}
+    <!--================ End footer Area  =================-->

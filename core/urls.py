@@ -25,6 +25,7 @@ urlpatterns = [
     path('checkout/', checkout, name = "checkout"),
     path('confirmation/', confirmation, name = "confirmation"),
     path('contact/', contact,name = "contact"),
+    path('historial_compras/', historial_compras,name = "historial_compras"),
     path('indexUser/', indexUser,name = "indexUser"),
     path('indexUserSubscito/', indexUserSubscito, name = "indexUserSubscito"),
     path('login/', login,name = "login"),

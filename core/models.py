@@ -84,19 +84,4 @@ class CarroCompras(models.Model):
         for item in self.items.all():
             total += item.subtotal()
         return total
-    
 
-class cliente(Group):
-    pass
-
-class vendedor(Group):
-    pass
-
-@receiver(post_save, sender=User)
-def assign_user_to_group(sender, instance, created, **kwargs):
-    if created:
-        group = Group.objects.get(name='usuario')
-        instance.groups.add(group)
-
-
-#seguimiento
