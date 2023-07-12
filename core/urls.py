@@ -4,6 +4,9 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('productos',ProductoViewset)
+router.register('TipoProducto',TipoProductoViewset)
+router.register('CarroItem',CarroItemViewset)
+router.register('CarroCompras',CarroComprasViewset)
 
 urlpatterns = [
     # API
@@ -29,7 +32,7 @@ urlpatterns = [
     path('register/', register,name = "register"),
     path('registro/', registro,name = "registro"),
     path('singleblog/', singleblog, name="singleblog"),
-    path('singleproduct/', singleproduct,name = "singleproduct"),
+    path('singleproduct/<id>', singleproduct, name="singleproduct"),
     path('subsForm/', subsForm,name = "subsForm"),
     path('trackingorder/', trackingorder,name = "tracking-order"),
 
@@ -43,6 +46,8 @@ urlpatterns = [
     path('cart/cartadd/<id>',cartadd, name="cartaddd"),
     path('cart/cartdelete/<id>',cartdelete, name="cartdelete"),
     path('add_compra/', add_compra, name="add_compra"),
+    path('suscribir/<id>/', agregar_suscriptor, name="suscribir"),
+    
     
 
 

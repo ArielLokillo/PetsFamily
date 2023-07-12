@@ -9,6 +9,10 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from rest_framework import viewsets
 from .serializers import *
 import requests 
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import Group
+from .forms import CustomUserCreationForm
+
 # Create your views here.
 
 #funcion generica que valida grupos
@@ -28,6 +32,21 @@ class ProductoViewset(viewsets.ModelViewSet):
 	queryset = Producto.objects.all()
 	#queryset = Producto.objects.filter(tipo=1)
 	serializer_class = ProductoSerializer
+
+class TipoProductoViewset(viewsets.ModelViewSet):
+	queryset = TipoProducto.objects.all()
+	#queryset = Producto.objects.filter(tipo=1)
+	serializer_class = TipoProductoSerializer
+
+class CarroItemViewset(viewsets.ModelViewSet):
+	queryset = CarroItem.objects.all()
+	#queryset = Producto.objects.filter(tipo=1)
+	serializer_class = CarroItemSerializer
+
+class CarroComprasViewset(viewsets.ModelViewSet):
+	queryset = CarroCompras.objects.all()
+	#queryset = Producto.objects.filter(tipo=1)
+	serializer_class = CarroComprasSerializer
 	
     
 def indexapi(request):
@@ -91,24 +110,29 @@ def blog(request):
    #
 
    #eturn render(request,'core/cart.html',data)
+  
 def cart(request):
-	
-	# LOGICA DEL CARRITO, SE SUMAN TODOS LOS PRECIOS
     carro_compras = CarroCompras.objects.get(usuario=request.user)
     items = carro_compras.items.all()
     total = carro_compras.total()
     respuesta = requests.get('https://mindicador.cl/api/dolar').json()
     valor_usd = respuesta['serie'][0]['valor']
-    valor_carrito = 'total' #SE SUPONE QUE ES EL TOTAL DEL CARRITO
-    valor_total = total/valor_usd
+    valor_carrito = 'total' # SE SUPONE QUE ES EL TOTAL DEL CARRITO
+    valor_total = total / valor_usd
+
+    for item in items:
+        producto = item.producto
+
+        # Actualizar el stock del producto restando 1 por cada elemento del carrito
+        producto.stock -= 1
+        producto.save()
 
     data = {
-		'total': round(valor_total,2),
-	    'items': items,
-        
-	}
-    return render(request, 'core/cart.html',data)
+        'total': round(valor_total, 2),
+        'items': items,
+    }
 
+    return render(request, 'core/cart.html', data)
 
 def cartUser(request):
 	return render(request, 'core/cartUser.html')
@@ -147,14 +171,25 @@ def register(request):
 def singleblog(request):
 	return render(request, 'core/single-blog.html')
 
-def singleproduct(request):
-	return render(request, 'core/single-product.html')
+def singleproduct(request, id):
+    producto = Producto.objects.get(id=id) #buscamos un producto por su id (primer campo base de datos y el otro es nuestro)
+    data = {
+        #'form' : ProductoForm(instance=producto) #Carga la info en el formulario
+        'producto' : producto
+    }
+        
+
+    return render(request,'core/single-product.html',data)
 
 def subsForm(request):
 	return render(request, 'core/subsForm.html')
 
 def trackingorder(request):
-	return render(request, 'core/tracking-order.html')
+    if request.method == 'POST':
+        pedido_id = request.POST.get('pedido_id')
+        pedido = get_object_or_404(Pedido, id=pedido_id)
+        return render(request, 'tracking-order.html', {'pedido': pedido})
+    return render(request, 'core/tracking-order.html')
 
 
 #crud
@@ -195,22 +230,23 @@ def delete(request,id):
 
 
 def registro(request):
-	data = {
-		'form': CustomUserCreationForm()
-	}
-	if request.method == 'POST':
-		formulario = CustomUserCreationForm(data=request.POST)
-		if formulario.is_valid():
-			formulario.save()
-		user = authenticate(username=formulario.cleaned_data["username"], password=formulario.cleaned_data["password1"])
-		login(request, user)
-		messages.success(request, "Te has registrado correctamente")
-			#redirigir al home
-		return redirect(to="index")
-		data["form"] = formulario
+    data = {
+        'form': CustomUserCreationForm()
+    }
+    if request.method == 'POST':
+        formulario = CustomUserCreationForm(data=request.POST)
+        if formulario.is_valid():
+            formulario.save()
+        if user is created:
+            assign_user_to_group('usuario')
+        user = authenticate(username=formulario.cleaned_data["username"], password=formulario.cleaned_data["password1"])
+        login(request, user)
+        messages.success(request, "Te has registrado correctamente")
+            #redirigir al home
+        return redirect(to="core/index")
+        data["form"] = formulario
 
-	return render(request, 'registration/registro.html', data)
-
+    return render(request, 'registration/registro.html', data)
 
 
 
@@ -271,31 +307,41 @@ def confirmation(request):
 
     return render(request,'core/confirmation.html',data)
 
-def cartadd(request,id):
+def cartadd(request, id):
     producto = Producto.objects.get(id=id)
     carro_compras, created = CarroCompras.objects.get_or_create(usuario=request.user)
     carro_item, item_created = CarroItem.objects.get_or_create(producto=producto, usuario=request.user)
+
     if not item_created:
-        carro_item.cantidad +=1
+        carro_item.cantidad += 1
         carro_item.save()
 
     carro_compras.items.add(carro_item)
     carro_compras.save()
 
-    return redirect(to='cart')
+    # Descuentar el stock del producto cuando se agrega al carrito
+    producto.stock -= 1
+    producto.save()
 
-def cartdel(request,id):
+    return redirect('cart')
+
+def cartdel(request, id):
     producto = Producto.objects.get(id=id)
-    carro_compras = CarroCompras.objects.get(usuario = request.user)
+    carro_compras = CarroCompras.objects.get(usuario=request.user)
     carro_item = carro_compras.items.get(producto=producto)
+
     if carro_item.cantidad > 1:
         carro_item.cantidad -= 1
         carro_item.save()
     else:
         carro_compras.items.remove(carro_item)
         carro_item.delete()
- 
-    return redirect(to='cart')
+
+        # Incrementar el stock del producto cuando se elimina el elemento del carrito
+        producto.stock += 1
+        producto.save()
+
+    return redirect('cart')
 
 def cartdelete(request,id):
     producto = Producto.objects.get(id=id)
@@ -304,6 +350,8 @@ def cartdelete(request,id):
 
     carro_compras.items.remove(carro_item)
     carro_item.delete()
+
+    
     return redirect(to='cart')
 
 def add_compra(request): 
@@ -316,6 +364,32 @@ def add_compra(request):
 
     carro_compras.items.clear()
     return redirect(to='confirmation')
+
+
+
+
+
+def agregar_suscriptor(request, id):
+    usuario = User.objects.get(id=id)
+    usuario.groups.add(5)
+    usuario.save()
+    return redirect('index')
+
+@permission_required('core.view_producto')
+def subsForm(request):
+    if request.method == 'POST':
+        form = DonacionForm(request.POST)
+        if form.is_valid():
+            # Procesa la donación (por ejemplo, guarda la cantidad en la base de datos)
+            cantidad = form.cleaned_data['cantidad']
+            # Realiza cualquier otro procesamiento necesario
+
+            # Redirige a la página de confirmación de donación exitosa o a la página de PayPal
+            return render(request, 'core/confirmation.html')
+    else:
+        form = DonacionForm()
+
+    return render(request, 'core/subsForm.html', {'form': form})
 
 
 
