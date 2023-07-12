@@ -317,7 +317,15 @@ def add_compra(request):
     carro_compras.items.clear()
     return redirect(to='confirmation')
 
+def realizar_compra(request, producto_id):
+	producto = Producto.objects.get(all)
+	compra = Compra(usuario=requests.user, producto=producto)
+	compra.save()
+	return redirect('historial_compras')
 
+def historial_compras(request):
+	compras = Compra.objects.filter(usuario=request.user)
+	return render(request, 'core/historial_compras.html',{'compras' : compras})
 
 
 
